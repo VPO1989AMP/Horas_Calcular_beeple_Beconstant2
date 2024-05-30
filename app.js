@@ -11,7 +11,7 @@ const {masColaboraders} = require('./masColaboradores.js')
 
 
 const app = express();
-const port = process.env.PORT || 9999;
+const port = process.env.PORT || 5555;
 
 // Middleware para analizar los datos del cuerpo de la solicitud
 app.use(bodyParser.urlencoded({ extended: true }));
