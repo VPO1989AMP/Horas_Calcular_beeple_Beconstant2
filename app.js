@@ -62,14 +62,15 @@ app.post("/calcularHoras", async (req, res) => {
                 const workHoursResponse = await axios.get(`${endpoint}/api/v1/admin/collaborators/worked_hours?filter[period][period_start_at]=${desde}&filter[period][period_end_at]=${hasta}&filter[status]=reported&page=${i}&page_items=500`, {
                     headers: headers
                 });
+
+                // Agregar los datos devueltos al array allWorkHoursData
+                allWorkHoursData = allWorkHoursData.concat(workHoursResponse.data.worked_hours);
+
                 // Verificar si se devolvieron datos
                 if (workHoursResponse.data.next === null) {
                     // Si no se devuelven datos, salir del bucle
                     break;
                 }
-
-                // Agregar los datos devueltos al array allWorkHoursData
-                allWorkHoursData = allWorkHoursData.concat(workHoursResponse.data.worked_hours);
 
                 // Incrementar el contador de página
                 i++;
