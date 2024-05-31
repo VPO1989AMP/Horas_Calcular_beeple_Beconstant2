@@ -22,7 +22,13 @@ function Calculos(tablaFinal) {
                         let diaFecha = moment(fecha).day()
                         for (const dia of jornadaArray){
                             if (transformarDia(dia)===diaFecha){
-                                horasTeoricas += horasDia
+                                //Añado esto para que el calculo de horas teóricas
+                                //solo se considere si está vacio ese dia.
+                                //Además de revisar que trabaja ese dia
+                                if (item[key] !== null && item[key] !== "" ){
+                                    horasTeoricas += horasDia
+                                    //console.log(id,key,item[key],)
+                                }
                             }
                         }
                     }

@@ -47,21 +47,23 @@ app.post("/calcularHoras", async (req, res) => {
     if (proyecto){
 
         let i = 1; // Inicializar el contador para las páginas
-        const maxPages = 20; // Número máximo de páginas que se deben recuperar
+        const maxPages = 1000; // Número máximo de páginas que se deben recuperar
 
         console.log("Empezar API Work hours", new Date())
         try {
             let allWorkHoursData = []; // Inicializar un array para almacenar todos los datos de horas trabajadas
+            
 
             while (i <= maxPages) {
+
                 // Realizar la solicitud al servidor para obtener las horas trabajadas
                 //console.log("Buscando datos...")
-                console.log(`${endpoint}/api/v1/admin/collaborators/worked_hours?filter[period][period_start_at]=${desde}&filter[period][period_end_at]=${hasta}&filter[status]=reported&page=${i}&page_items=650`)
-                const workHoursResponse = await axios.get(`${endpoint}/api/v1/admin/collaborators/worked_hours?filter[period][period_start_at]=${desde}&filter[period][period_end_at]=${hasta}&filter[status]=reported&page=${i}&page_items=650`, {
+                console.log(`${endpoint}/api/v1/admin/collaborators/worked_hours?filter[period][period_start_at]=${desde}&filter[period][period_end_at]=${hasta}&filter[status]=reported&page=${i}&page_items=500`)
+                const workHoursResponse = await axios.get(`${endpoint}/api/v1/admin/collaborators/worked_hours?filter[period][period_start_at]=${desde}&filter[period][period_end_at]=${hasta}&filter[status]=reported&page=${i}&page_items=500`, {
                     headers: headers
                 });
                 // Verificar si se devolvieron datos
-                if (workHoursResponse.data.worked_hours.length === 0) {
+                if (workHoursResponse.data.next === null) {
                     // Si no se devuelven datos, salir del bucle
                     break;
                 }
