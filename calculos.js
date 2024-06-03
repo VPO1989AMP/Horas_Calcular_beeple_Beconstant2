@@ -114,13 +114,13 @@ function roundQuarterHour(dateString, type) {
     // Agregar los minutos faltantes
     if (type === "up") {
         let minutesToAdd = 15 - minutesToSubtract;
-        if (minutesToAdd>=10){
+        if (minutesToAdd>9){
             date.setMinutes(date.getMinutes() - minutesToSubtract);
         }else{
             date.setMinutes(date.getMinutes() + minutesToAdd);
         }
     } else if (type === "down") {
-        if (minutesToSubtract>=11){
+        if (minutesToSubtract>10){
             //si estamos muy cerca de la hora superior lo ponemos arriba
             let minutesToAdd = 15 - minutesToSubtract;
             date.setMinutes(date.getMinutes() + minutesToAdd);
@@ -171,6 +171,9 @@ function calcularHorasNocturnas(momentoInicio, momentoFin) {
     momento06Referencia.setDate(momento06Referencia.getDate() + 1);
     momento06Referencia.setHours(6, 0, 0, 0);
     momento06Referencia.setHours(momento06Referencia.getHours() + 2);
+    let momento06ReferenciaMismoDia   = new Date(momentoInicio);
+    momento06ReferenciaMismoDia.setHours(6, 0, 0, 0);
+    momento06ReferenciaMismoDia.setHours(momento06ReferenciaMismoDia.getHours() + 2);
 
          
     //console.log(inicio,fin,momento22Referencia,momento06Referencia)
@@ -184,6 +187,9 @@ function calcularHorasNocturnas(momentoInicio, momentoFin) {
     }else if(moment(inicio).isSameOrAfter(moment(momento22Referencia)) && moment(inicio).isSameOrBefore(moment(momento06Referencia)) && moment(fin).isSameOrAfter(moment(momento06Referencia))){
         //se ha empezado sin noctura pero se finaliza en noctura
         return calcularDiferenciaHoras(inicio,momento06Referencia)
+    }else if(moment(inicio).isSameOrBefore(moment(momento06ReferenciaMismoDia)) && moment(fin).isSameOrBefore(moment(momento22Referencia))){
+        //se ha empezado sin noctura pero se finaliza en noctura
+        return calcularDiferenciaHoras(inicio,momento06ReferenciaMismoDia)
     }else{
         return 0
     }
