@@ -246,6 +246,8 @@ app.post("/calcularHoras", async (req, res) => {
                     "horas_totales": "#D384C1", 
                     "horas_nocturnas": "#F2B9E6", 
                     "horas_diurnas": "#F2B9E6", 
+                    "horas_sabado": "#F2B9E6", 
+                    "horas_domingo": "#F2B9E6", 
                     "max_horas_complementarias": "#C6E8DB", 
                     "total_ANJ": "#D384C1", 
                     "dias_vacaciones_periodo":"#FFFFE0",
@@ -272,6 +274,8 @@ app.post("/calcularHoras", async (req, res) => {
                 htmlResponse += '<th>Horas Totales</th>';
                 htmlResponse += '<th>H. Noct.</th>';
                 htmlResponse += '<th>H. Diur.</th>';
+                htmlResponse += '<th>H. Sab.</th>';
+                htmlResponse += '<th>H. Dom.</th>';
                 htmlResponse += '<th>Max.H.Compl.</th>';
                 htmlResponse += '<th>Total ANJ(#)</th>';
                 htmlResponse += '<th>VAC periodo (días)</th>';
