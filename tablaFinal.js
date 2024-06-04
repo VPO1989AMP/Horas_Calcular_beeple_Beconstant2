@@ -27,6 +27,7 @@ function ConstruccionTablaFinal(tablaFinal, uniqueCollaboratorsArray,datesObject
             "collaborator_jornada": item.collaborator_detail["Jornada"], 
             "collaborator_cod_net4": item.collaborator_detail["Código Trabajador NET4"], 
             "collaborator_dni_nie": item.collaborator_dninie, 
+            "collaborator_contract_type": item.collaborator_contract_type, 
             ...datesObject,
             "horas_totales": horasTotales, 
             "horas_nocturnas":horasNocturnas,

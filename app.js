@@ -169,7 +169,8 @@ app.post("/calcularHoras", async (req, res) => {
                         "availabilities": availability,
                         "collaborator_dninie":collaboratorDetail.dniNie,
                         "collaborator_detail": collaboratorDetail,
-                        "collaborator_counters":collaboratorCounters
+                        "collaborator_counters":collaboratorCounters,
+                        "collaborator_contract_type":collaboratorDetail.collaborator_type_contract
                     });
                 }
             }
@@ -241,6 +242,7 @@ app.post("/calcularHoras", async (req, res) => {
                     "collaborator_jornada": "lightblue",
                     "collaborator_cod_net4": "lightblue",
                     "collaborator_dni_nie": "lightblue",
+                    "collaborator_contract_type": "lightblue",
                     "horas_totales": "#D384C1", 
                     "horas_nocturnas": "#F2B9E6", 
                     "horas_diurnas": "#F2B9E6", 
@@ -260,7 +262,7 @@ app.post("/calcularHoras", async (req, res) => {
                 let htmlResponse = '<table border="1" class="table">';
                 //let htmlResponse = '<table class="table table-bordered table-striped" style="color: black;">';
 
-                htmlResponse += '<th>Col.ID</th><th>Col.Name</th><th>Alta</th><th>Baja</th><th>H.dia</th><th>H.Sem.</th><th>Jornada</th><th>Cod.Net.4</th><th>DNI</th>'; // Encabezados de columna
+                htmlResponse += '<th>Col.ID</th><th>Col.Name</th><th>Alta</th><th>Baja</th><th>H.dia</th><th>H.Sem.</th><th>Jornada</th><th>Cod.Net.4</th><th>DNI</th><th>T.Contrato</th>'; // Encabezados de columna
 
                 // Encabezados de columna para las fechas
                 for (const dateKey in datesObject) {
