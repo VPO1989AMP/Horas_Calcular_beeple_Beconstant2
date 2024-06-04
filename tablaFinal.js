@@ -73,11 +73,10 @@ function HorasYAusenciasNoJustificadas(tablaFinal,workhoursFiltrados){
                         horasDiurnas = horasDiurnas + workhour.duration_work_day_hours
                         horasNocturnas = horasNocturnas + workhour.duration_work_night_hours
                         if ((new Date(key)).getDay()===6){
-                            console.log("SABADO")
                             horasSabado = horasSabado + workhour.duration_work_rounded
                             //console.log("SABADO",key,horasSabado)
                         }
-                        if ((new Date(key)).getDay()===7){
+                        if ((new Date(key)).getDay()===0){
                             horasDomingo = horasDomingo +  workhour.duration_work_rounded
                             //console.log("DOMINGO",key,horasDomingo)
                         }
