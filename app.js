@@ -4,7 +4,7 @@ const axios = require("axios");
 const bodyParser = require("body-parser");
 const { getAvailability, getColaboratorDetail, getCounters } = require('./collaboratorUtils');
 const { getVacacionesId,getProyecto,getDisponibilidadesMaster} = require('./otrasFunciones');
-const {Calculos, ObtenerNombreMes,roundQuarterHour, calcularDiferenciaHoras, calcularHorasNocturnas,calcularHorasDiurnas} = require('./calculos');
+const {Calculos, ObtenerNombreMes,roundQuarterHour, calcularDiferenciaHoras, calcularHorasNocturnas,calcularHorasDiurnas, convertirATiempoDecimal} = require('./calculos');
 const Token = require('./token'); // Ruta al archivo token.js
 const { HorasYAusenciasNoJustificadas, AusenciasJustificadas, ConstruccionTablaFinal, Contadores,VacacionesPeriodoSeleccionado } = require('./tablaFinal.js');
 const {masColaboraders} = require('./masColaboradores.js')
@@ -24,6 +24,8 @@ const API_TOKEN = Token()
 
 app.post("/calcularHoras", async (req, res) => {
     const departamento = req.body.departamento;
+    const vista = req.body.vista
+    //vista puede ser nominas o facturas
     const password = req.body.password;
     const desde = req.body.fechadesde;
     const mesNumero = (new Date(desde).getMonth());
@@ -37,6 +39,7 @@ app.post("/calcularHoras", async (req, res) => {
         'Token': API_TOKEN
     };
     //Buscar el id del proyecto para despues filtrar
+    console.log("Buscando datos relevantes en Beeple...Maestros")
     const proyecto = await getProyecto(endpoint,headers,departamento)
     //Cargar el maestro de disponibilidades
     const disponibilidadesMaster = await getDisponibilidadesMaster(endpoint,headers)
@@ -76,7 +79,7 @@ app.post("/calcularHoras", async (req, res) => {
                 i++;
             }
             console.log("TERMINAMOS API Work hours", new Date())
-            console.log("Filtramos horas del proyecto", new Date())
+            console.log("Filtramos horas de proyecto o de departamento según vista", new Date())
 
             //TRATAMIENTO DE LOS DATOS DE HORAS TRABAJADAS#####################################################
             //SOLO BUSCAMOS HORAS DEL DEPARTAMENTO SELECCIONADO################################################
@@ -85,8 +88,17 @@ app.post("/calcularHoras", async (req, res) => {
             //console.log(workHoursData)
             //Filtramos los elementos que tienen el valor 'departamento' en el array item.enrolment.volunteer.departments_ids[0]==departamento
             //const workhoursDep = workHoursData.filter(item => (item.enrolment.volunteer.department_ids[0] == departamento && item.enrolment.cancelled === false));
-            const workhoursDep = workHoursData.filter(item => (item.enrolment.cancelled === false && item.enrolment.team.project_id == String(proyecto)))
-            console.log("TERMINAMOS filtrado horas del proyecto", new Date())
+            let workhoursDep;
+            if (String(vista)==="nominas"){
+                //Solo buscamos horas de trabajadores que pertenecen a departamento en concreto --> Pago de nóminas
+                workhoursDep = workHoursData.filter(item => (item.enrolment.cancelled === false && String(item.enrolment.collaborator.department_ids[0]) == String(departamento)))
+            }else{
+                //buscamos todas las horas que se han realizado en el departamento. Independientemente de si el trabajador es o no de ese centro
+                workhoursDep = workHoursData.filter(item => (item.enrolment.cancelled === false && String(item.enrolment.team.project_id) == String(proyecto)))
+               
+            }
+            //console.log(workhoursDep)
+            console.log("TERMINAMOS filtrado horas de proyecto o de departamento según vista", new Date())
             console.log("Creamos un array con todos los datos formateados y agregamos otros", new Date())
             // Mapeamos los elementos filtrados para extraer solo algunos datos
             const workhoursFiltrados = workhoursDep.map(item => {
@@ -99,6 +111,16 @@ app.post("/calcularHoras", async (req, res) => {
                 let horasTrabajadas = calcularDiferenciaHoras(horaInicioRounded,horaFinalRounded)
                 let horasNocturnas = calcularHorasNocturnas(horaInicioRounded,horaFinalRounded)
                 let horasDiurnas = calcularHorasDiurnas(horasTrabajadas,horasNocturnas)
+                let descanso = convertirATiempoDecimal(item.confirmed_break_duration)
+                let departamentosDistintos
+                if (proyecto != item.enrolment.team.project_id){
+                    //console.log("horas realizadas en otro proyecto",item.enrolment.team)
+                    departamentosDistintos = true
+                    // console.log("hours in other department")
+                }else{
+                    departamentosDistintos = false
+                }
+                //console.log("item",item)
                 return {
                     "collaborator_id": item.enrolment.volunteer.id,
                     "collaborator_name": item.enrolment.volunteer.name,
@@ -112,13 +134,15 @@ app.post("/calcularHoras", async (req, res) => {
                     "duration_work": duration.asHours(),
                     "start_confirmed_rounded":horaInicioRounded,
                     "end_confirmed_rounded":horaFinalRounded,
+                    "confirmed_break_duration":descanso,
                     "duration_work_night_hours":horasNocturnas,
                     "duration_work_day_hours":horasDiurnas,
                     //Modificación tras hablar con Camelin. Antes se redondeaba las horas totales
                     //ahora se redondean a cuartos la hora de entrada y de salida y a partir de ahir
                     //se realiza el cálculo de las horas trabajadas
-                    "duration_work_rounded":horasTrabajadas,
+                    "duration_work_rounded":horasTrabajadas - descanso,
                     //"duration_work_rounded": durationRounded 
+                    "hours_in_other_project":departamentosDistintos,
                 };
             });
             console.log("TERMINAMOS el crear un array con todos los datos formateados y agregamos otros", new Date())

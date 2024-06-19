@@ -120,7 +120,7 @@ function roundQuarterHour(dateString, type) {
             date.setMinutes(date.getMinutes() + minutesToAdd);
         }
     } else if (type === "down") {
-        if (minutesToSubtract>10){
+        if (minutesToSubtract>9){
             //si estamos muy cerca de la hora superior lo ponemos arriba
             let minutesToAdd = 15 - minutesToSubtract;
             date.setMinutes(date.getMinutes() + minutesToAdd);
@@ -208,6 +208,22 @@ function calcularHorasDiurnas(horasTrabajadas, horasNocturnas) {
 }
 
 
+function convertirATiempoDecimal(tiempo) {
+    // Divide el tiempo en horas y minutos
+    if (tiempo === null || tiempo === undefined || tiempo.trim() === "") {
+        return 0
+    }else {
+        
+        const [horas, minutos] = tiempo.split(':').map(Number);
+        
+        const minutosDecimal = minutos / 60;
+        const tiempoDecimal = horas + minutosDecimal;
+        
+        return parseFloat(tiempoDecimal).toFixed(2);
+    }
+}
+
+
 
 module.exports = {
     Calculos,
@@ -216,5 +232,6 @@ module.exports = {
     calcularDiferenciaHoras,
     calcularHorasNocturnas,
     calcularHorasDiurnas,
-    transformarDia
+    transformarDia,
+    convertirATiempoDecimal
 }

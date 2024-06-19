@@ -57,45 +57,50 @@ function HorasYAusenciasNoJustificadas(tablaFinal,workhoursFiltrados){
         for (const key in item) {
             if (key == "collaborator_id") {
                 id = item[key];
-            //}else if (key !== "collaborator_name" && key !== "horas_diurnas" && key !== "horas_nocturnas" && key !== "horas_totales" && key !== "total_ANJ" && key !== "collaborator_fecha_alta" && key !== "collaborator_fecha_baja" && key !== "collaborator_horas_contrato_dia" && key !== "collaborator_jornada" && key !== "collaborator_cod_net4") {
-            }else if (!isNaN(new Date(key).getTime())){    
-                const workhour = workhoursFiltrados.find(entry =>{ 
-                    return(
+            } else if (!isNaN(new Date(key).getTime())) {
+                const workhours = workhoursFiltrados.filter(entry => {
+                    return (
                         entry.collaborator_id == id && entry.shift_date == key
-                    )
+                    );
                 });
-                //console.log(key)
-                //console.log(workhour)
-                if (workhour) {
-                    if (!isNaN(workhour.duration_work_rounded) && workhour.duration_work_rounded != null ) {
-                        item[key] = workhour.duration_work_rounded;
-                        horasTotales = horasTotales + workhour.duration_work_rounded
-                        horasDiurnas = horasDiurnas + workhour.duration_work_day_hours
-                        horasNocturnas = horasNocturnas + workhour.duration_work_night_hours
-                        if ((new Date(key)).getDay()===6){
-                            horasSabado = horasSabado + workhour.duration_work_rounded
-                            //console.log("SABADO",key,horasSabado)
-                        }
-                        if ((new Date(key)).getDay()===0){
-                            horasDomingo = horasDomingo +  workhour.duration_work_rounded
-                            //console.log("DOMINGO",key,horasDomingo)
-                        }
-                        
-                    } else {
-                        //console.log("paso")
-                        item[key] = "ANJ"
-                        totalANJ = totalANJ +1
-                    }
-                }
                 
+                if (workhours.length > 0) {
+                    workhours.forEach(workhour => {
+                        if (!isNaN(workhour.duration_work_rounded) && workhour.duration_work_rounded != null) {
+                            // Marcar las horas que han sido realizadas en un proyecto 
+                            // distinto al que tiene el trabajador en su ficha
+                            if (workhour["hours_in_other_project"]) {
+                                item[key] = item[key] === "" ? `* ${workhour.duration_work_rounded} *` : `${item[key]} * ${workhour.duration_work_rounded} * `;
+                            } else {
+                                item[key] = item[key] === "" ? `${workhour.duration_work_rounded}` : `${item[key]} - ${workhour.duration_work_rounded}`;
+                            }
+                            horasTotales += workhour.duration_work_rounded;
+                            horasDiurnas += workhour.duration_work_day_hours;
+                            horasNocturnas += workhour.duration_work_night_hours;
+                            if ((new Date(key)).getDay() === 6) {
+                                horasSabado += workhour.duration_work_rounded;
+                                //console.log("SABADO",key,horasSabado)
+                            }
+                            if ((new Date(key)).getDay() === 0) {
+                                horasDomingo += workhour.duration_work_rounded;
+                                //console.log("DOMINGO",key,horasDomingo)
+                            }
+                        } else {
+                            //console.log("paso")
+                            item[key] = "ANJ";
+                            totalANJ += 1;
+                        }
+                    });
+                }
             }
         }
+        
         // Actualizamos valor de horas y de ANJ
-        item["horas_totales"] = horasTotales;
-        item["horas_nocturnas"] = horasNocturnas;
-        item["horas_diurnas"] = horasDiurnas;
-        item["horas_sabado"] = horasSabado;
-        item["horas_domingo"] = horasDomingo;
+        item["horas_totales"] = parseFloat(horasTotales).toFixed(2);
+        item["horas_nocturnas"] = parseFloat(horasNocturnas).toFixed(2);
+        item["horas_diurnas"] = parseFloat(horasDiurnas).toFixed(2);
+        item["horas_sabado"] = parseFloat(horasSabado).toFixed(2);
+        item["horas_domingo"] = parseFloat(horasDomingo).toFixed(2);
         item["total_ANJ"] = totalANJ
     }    
 }

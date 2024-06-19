@@ -38,6 +38,13 @@
         <form id="horasForm" action="/calcularHoras" method="post">
             <div class="row align-items-end">
                 <div class="col-md-6">
+                    <label for="vista" class="form-label">Choose an option:</label>
+                    <select id="vista" name="vista" class="form-select" required>
+                        <option value="nominas">Vista trabajador (Nóminas)</option>
+                        <option value="facturas">Vista proyecto (Factura a cliente)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
                     <label for="departamento" class="form-label">Departamento</label>
                     <select id="departamento" name="departamento" class="form-select" required>
                         <!-- Las opciones se agregarán dinámicamente aquí -->
